@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laura Wiese – Ernährungsberatung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #F7F3EC;
+      --sage: #8B9D77;
+      --forest: #2D4A3E;
+      --terra: #C4724A;
+      --sand: #D9C9A8;
+      --dark: #1C2B25;
+      --light-sage: #EAF0E4;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 60px;
+      z-index: 100;
+      mix-blend-mode: normal;
+    }
+    nav::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, var(--cream) 0%, transparent 100%);
+      opacity: 0.85;
+      z-index: -1;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--forest);
+      letter-spacing: 0.02em;
+    }
+    .nav-links {
+      display: flex; gap: 40px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--forest);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-cta {
+      background: var(--forest);
+      color: var(--cream) !important;
+      opacity: 1 !important;
+      padding: 10px 22px;
+      border-radius: 40px;
+    }
+    .nav-cta:hover { background: var(--terra); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 160px 60px 100px;
+      position: relative; z-index: 2;
+    }
+
+    .hero-tag {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 5.5vw, 6rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--dark);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.35s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--forest);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--forest);
+      max-width: 400px;
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.55s forwards;
+    }
+
+    .hero-actions {
+      display: flex; align-items: center; gap: 28px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.7s forwards;
+    }
+
+    .btn-primary {
+      background: var(--forest);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--terra); transform: translateY(-2px); }
+
+    .btn-secondary {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--forest);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0.75;
+      transition: opacity 0.2s, gap 0.2s;
+    }
+    .btn-secondary:hover { opacity: 1; gap: 14px; }
+    .btn-secondary::after { content: '→'; font-size: 1rem; }
+
+    /* ── HERO RIGHT (Image area) ── */
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-image-block {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, var(--light-sage) 0%, var(--sand) 60%, #c8b897 100%);
+    }
+
+    /* Decorative botanical SVG shapes */
+    .hero-image-block::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(ellipse 60% 80% at 70% 40%, rgba(45,74,62,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 30% 70%, rgba(196,114,74,0.1) 0%, transparent 60%);
+    }
+
+    .leaf-svg {
+      position: absolute;
+      opacity: 0;
+      animation: leafIn 1.2s 0.8s forwards;
+    }
+    .leaf-1 { top: 15%; right: 8%; width: 220px; transform: rotate(25deg); }
+    .leaf-2 { bottom: 20%; left: 5%; width: 160px; transform: rotate(-15deg); }
+    .leaf-3 { top: 55%; right: 15%; width: 100px; transform: rotate(60deg); }
+
+    .hero-stats {
+      position: absolute;
+      bottom: 80px; left: 40px;
+      background: rgba(247,243,236,0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 28px 32px;
+      display: flex; gap: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.1s forwards;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 600;
+      color: var(--forest);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--terra);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px; left: 60px;
+      display: flex; align-items: center; gap: 12px;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.3s forwards;
+    }
+    .scroll-line {
+      width: 48px; height: 1px;
+      background: var(--sage);
+      position: relative; overflow: hidden;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--terra);
+      animation: lineSlide 2s 1.5s infinite;
+    }
+    .scroll-text {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sage);
+    }
+
+    /* ── APPROACH SECTION ── */
+    .approach {
+      padding: 140px 60px;
+      background: var(--forest);
+      color: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+    .approach::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(139,157,119,0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 20px;
+    }
+    .approach-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .approach-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 3.5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--cream);
+    }
+    .approach-heading em { font-style: italic; color: var(--sand); }
+
+    .approach-right { padding-top: 60px; }
+    .approach-text {
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.9;
+      color: rgba(247,243,236,0.75);
+      margin-bottom: 48px;
+    }
+
+    .pillars {
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .pillar {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 24px;
+      border: 1px solid rgba(139,157,119,0.25);
+      border-radius: 16px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .pillar:hover {
+      border-color: var(--sage);
+      background: rgba(139,157,119,0.08);
+    }
+    .pillar-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .pillar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--sand);
+      margin-bottom: 6px;
+    }
+    .pillar-desc {
+      font-size: 0.82rem;
+      color: rgba(247,243,236,0.6);
+      line-height: 1.7;
+    }
+
+    /* ── SERVICES ── */
+    .services {
+      padding: 140px 60px;
+      background: var(--cream);
+    }
+    .services-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 72px;
+    }
+    .services-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--dark);
+      max-width: 400px;
+    }
+    .services-title em { font-style: italic; color: var(--terra); }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .service-card {
+      background: var(--light-sage);
+      border-radius: 24px;
+      padding: 44px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .service-card:hover { transform: translateY(-6px); }
+    .service-card:nth-child(2) {
+      background: var(--forest);
+      color: var(--cream);
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(45,74,62,0.07);
+    }
+    .service-card:nth-child(2)::before {
+      background: rgba(247,243,236,0.07);
+    }
+    .service-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--sage);
+      opacity: 0.5;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .service-card:nth-child(2) .service-num { color: var(--sand); }
+    .service-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: var(--forest);
+      margin-bottom: 14px;
+    }
+    .service-card:nth-child(2) .service-name { color: var(--cream); }
+    .service-desc {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: rgba(44,74,62,0.7);
+      margin-bottom: 28px;
+    }
+    .service-card:nth-child(2) .service-desc { color: rgba(247,243,236,0.7); }
+    .service-price {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terra);
+      font-weight: 500;
+    }
+    .service-card:nth-child(2) .service-price { color: var(--sand); }
+
+    /* ── TESTIMONIAL ── */
+    .testimonial {
+      padding: 100px 60px;
+      background: var(--sand);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10rem;
+      color: var(--sage);
+      opacity: 0.3;
+      position: absolute;
+      top: -20px; left: 80px;
+      line-height: 1;
+      user-select: none;
+    }
+    .testimonial-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 2.5vw, 2.6rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--forest);
+      max-width: 860px;
+      margin: 0 auto 36px;
+      position: relative; z-index: 1;
+    }
+    .testimonial-author {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terra);
+    }
+
+    /* ── PROCESS ── */
+    .process {
+      padding: 140px 60px;
+      background: var(--cream);
+    }
+    .process-header { margin-bottom: 80px; }
+    .process-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      font-weight: 300;
+      color: var(--dark);
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 32px; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--sage), transparent);
+    }
+    .step {
+      padding: 0 24px;
+      text-align: center;
+      position: relative;
+    }
+    .step-circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--forest);
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      position: relative; z-index: 1;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .step:hover .step-circle { background: var(--terra); transform: scale(1.1); }
+    .step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--forest);
+      margin-bottom: 12px;
+    }
+    .step-desc {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: rgba(28,43,37,0.6);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 120px 60px;
+      background: var(--forest);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,157,119,0.2) 0%, transparent 70%);
+    }
+    .cta-label {
+      font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--sage); margin-bottom: 20px;
+    }
+    .cta-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 4vw, 4.5rem);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .cta-title em { font-style: italic; color: var(--sand); }
+    .cta-sub {
+      font-size: 0.95rem; color: rgba(247,243,236,0.6);
+      max-width: 480px; margin: 0 auto 48px;
+      font-weight: 300; line-height: 1.7;
+    }
+    .cta-btn {
+      background: var(--terra);
+      color: var(--cream);
+      font-size: 0.9rem; font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 18px 48px;
+      border-radius: 50px;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .cta-btn:hover { transform: translateY(-3px); background: #b3603c; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 60px;
+      background: var(--dark);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600;
+      color: var(--cream);
+    }
+    .footer-copy {
+      font-size: 0.78rem; color: rgba(247,243,236,0.4);
+    }
+    .footer-links {
+      display: flex; gap: 28px; list-style: none;
+    }
+    .footer-links a {
+      font-size: 0.78rem; color: rgba(247,243,236,0.5);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--sand); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes leafIn {
+      from { opacity: 0; transform: rotate(var(--rot, 25deg)) scale(0.7); }
+      to   { opacity: 0.85; transform: rotate(var(--rot, 25deg)) scale(1); }
+    }
+    @keyframes lineSlide {
+      0%   { left: -100%; }
+      50%  { left: 0%; }
+      100% { left: 100%; }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Laura Wiese</div>
+    <ul class="nav-links">
+      <li><a href="#approach">Philosophie</a></li>
+      <li><a href="#services">Angebote</a></li>
+      <li><a href="#process">Ablauf</a></li>
+      <li><a href="#contact" class="nav-cta">Termin buchen</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-tag">Ganzheitliche Ernährungsberatung · Berlin</p>
+      <h1 class="hero-title">
+        Iss dich<br/>
+        <em>gesund,</em><br/>
+        nicht leer.
+      </h1>
+      <p class="hero-sub">
+        Keine Diätpläne von der Stange. Keine Verbote. Nur ein Ernährungskonzept, das wirklich zu deinem Leben passt – wissenschaftlich fundiert und menschlich begleitet.
+      </p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">Erstgespräch buchen</a>
+        <a href="#services" class="btn-secondary">Angebote entdecken</a>
+      </div>
+      <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        <span class="scroll-text">Scroll</span>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-image-block"></div>
+
+      <!-- Botanical leaves (SVG) -->
+      <svg class="leaf-svg leaf-1" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 10 C60 40 20 100 30 180 C40 240 90 270 100 270 C110 270 160 240 170 180 C180 100 140 40 100 10Z" fill="#2D4A3E" opacity="0.7"/>
+        <line x1="100" y1="20" x2="100" y2="260" stroke="#8B9D77" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="80" x2="60" y2="120" stroke="#8B9D77" stroke-width="1" opacity="0.5"/>
+        <line x1="100" y1="120" x2="145" y2="155" stroke="#8B9D77" stroke-width="1" opacity="0.5"/>
+        <line x1="100" y1="155" x2="58" y2="190" stroke="#8B9D77" stroke-width="1" opacity="0.5"/>
+      </svg>
+      <svg class="leaf-svg leaf-2" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 10 C60 40 20 100 30 180 C40 240 90 270 100 270 C110 270 160 240 170 180 C180 100 140 40 100 10Z" fill="#C4724A" opacity="0.5"/>
+        <line x1="100" y1="20" x2="100" y2="260" stroke="#D9C9A8" stroke-width="1.5" opacity="0.6"/>
+      </svg>
+      <svg class="leaf-svg leaf-3" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 10 C60 40 20 100 30 180 C40 240 90 270 100 270 C110 270 160 240 170 180 C180 100 140 40 100 10Z" fill="#8B9D77" opacity="0.6"/>
+      </svg>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">320+</div>
+          <div class="stat-label">Klient·innen</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8</div>
+          <div class="stat-label">Jahre Erfahrung</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">97%</div>
+          <div class="stat-label">Weiterempfehlung</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPROACH -->
+  <section class="approach" id="approach">
+    <div class="section-label reveal">Meine Philosophie</div>
+    <div class="approach-grid">
+      <div class="approach-left reveal">
+        <h2 class="approach-heading">
+          Ernährung ist<br/>
+          mehr als<br/>
+          <em>Kalorien zählen.</em>
+        </h2>
+      </div>
+      <div class="approach-right reveal">
+        <p class="approach-text">
+          Jeder Mensch ist einzigartig – seine Biografie, sein Alltag, sein Körper. Ich entwickle mit dir gemeinsam ein Ernährungskonzept, das nicht nur funktioniert, sondern das du wirklich liebst.
+        </p>
+        <div class="pillars">
+          <div class="pillar">
+            <span class="pillar-icon">🌿</span>
+            <div>
+              <div class="pillar-title">Wissenschaftlich fundiert</div>
+              <div class="pillar-desc">Aktuelle Ernährungswissenschaft trifft auf individuelle Körperreaktion – kein Trend-Hype, nur was wirklich wirkt.</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🧬</span>
+            <div>
+              <div class="pillar-title">Individuell & nachhaltig</div>
+              <div class="pillar-desc">Kein Einheitsbrei. Dein Plan entsteht aus deinen Gewohnheiten, Präferenzen und Zielen.</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">💬</span>
+            <div>
+              <div class="pillar-title">Menschliche Begleitung</div>
+              <div class="pillar-desc">Ich bin auch zwischen den Terminen ansprechbar – weil Veränderung im Alltag passiert, nicht im Beratungszimmer.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="services-header reveal">
+      <div>
+        <div class="section-label">Angebote</div>
+        <h2 class="services-title">Was ich für dich<br/><em>tun kann</em></h2>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-num">01</div>
+        <div class="service-name">Erstberatung & Analyse</div>
+        <div class="service-desc">90-minütiges Tiefeninterview zu Ernährungsgewohnheiten, Zielen, Stresssituationen und Lifestyle. Inkl. Ernährungsprotokoll-Auswertung.</div>
+        <div class="service-price">Ab 120 € · Einmalig</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">02</div>
+        <div class="service-name">Intensiv-Programm</div>
+        <div class="service-desc">12-Wochen-Begleitung mit wöchentlichen Check-ins, individuell entwickeltem Ernährungsplan und unbegrenztem Messenger-Support.</div>
+        <div class="service-price">480 € · 12 Wochen</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">03</div>
+        <div class="service-name">Online-Kochkurs</div>
+        <div class="service-desc">4 Live-Sessions mit praktischen Kocheinheiten, Einkaufslisten und Rezeptbibliothek. Für Einzelpersonen und Paare.</div>
+        <div class="service-price">180 € · 4 Termine</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="testimonial">
+    <div class="quote-mark">"</div>
+    <p class="testimonial-text reveal">
+      „Zum ersten Mal in meinem Leben habe ich aufgehört, gegen meinen Körper zu kämpfen. Laura hat mir gezeigt, dass gesunde Ernährung sich nicht wie Verzicht anfühlen muss."
+    </p>
+    <p class="testimonial-author reveal">Sarah K., 34 · Programmiererin aus Hamburg</p>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" id="process">
+    <div class="process-header reveal">
+      <div class="section-label">So läuft's ab</div>
+      <h2 class="process-title">In 4 Schritten zu mehr <em style="font-style:italic;color:var(--terra)">Wohlbefinden</em></h2>
+    </div>
+    <div class="process-steps">
+      <div class="step reveal">
+        <div class="step-circle">1</div>
+        <div class="step-title">Erstgespräch</div>
+        <div class="step-desc">Kostenloses 20-Min.-Kennenlernen per Video. Ich höre zu, du fragst alles, was du wissen willst.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-circle">2</div>
+        <div class="step-title">Analyse</div>
+        <div class="step-desc">Detailliertes Ernährungs- und Lifestyle-Profil. Ich identifiziere Muster und Potenziale.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-circle">3</div>
+        <div class="step-title">Dein Plan</div>
+        <div class="step-desc">Dein persönliches Ernährungskonzept – realistisch, lecker und auf deinen Alltag zugeschnitten.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-circle">4</div>
+        <div class="step-title">Begleitung</div>
+        <div class="step-desc">Regelmäßige Check-ins, Anpassungen und Support. Du bist nie allein mit deinen Fragen.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contact">
+    <p class="cta-label reveal">Bereit?</p>
+    <h2 class="cta-title reveal">Dein erster Schritt<br/><em>kostet nichts.</em></h2>
+    <p class="cta-sub reveal">Buch dir ein kostenloses 20-Minuten-Erstgespräch. Kein Verkaufsgespräch – versprochen.</p>
+    <a href="mailto:hallo@laura-wiese.de" class="cta-btn reveal">Kostenloses Erstgespräch buchen</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Laura Wiese</div>
+    <ul class="footer-links">
+      <li><a href="#">Impressum</a></li>
+      <li><a href="#">Datenschutz</a></li>
+      <li><a href="#">Instagram</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 Laura Wiese Ernährungsberatung</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => obs.observe(r));
+  </script>
+
+</body>
+</html>

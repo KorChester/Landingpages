@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Jonas Brandt – Ernährungsberatung</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:   #0E1714;
+  --mid:   #2C3B36;
+  --rust:  #C94B25;
+  --warm:  #E8A87C;
+  --taupe: #B8A99A;
+  --bg:    #F0EDE6;
+  --bg2:   #E8E3DA;
+  --paper: #FAFAF5;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Figtree',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* ── CURSOR ── */
+.cursor{
+  width:10px;height:10px;background:var(--rust);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);transition:transform .1s,width .3s,height .3s;
+}
+.cursor-ring{
+  width:36px;height:36px;border:1px solid var(--rust);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);transition:transform .18s ease,width .3s,height .3s,opacity .3s;
+  opacity:0.5;
+}
+
+/* ── NAV – vertical left sidebar ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:72px;
+  background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:36px 0;
+  z-index:200;
+}
+.sidebar-logo{
+  writing-mode:vertical-rl;
+  font-family:'Fraunces',serif;
+  font-size:.95rem;font-weight:700;
+  color:var(--bg);letter-spacing:.12em;
+  text-transform:uppercase;cursor:default;
+  transform:rotate(180deg);
+}
+.sidebar-links{
+  display:flex;flex-direction:column;align-items:center;gap:32px;list-style:none;
+}
+.sidebar-links a{
+  writing-mode:vertical-rl;
+  font-size:.62rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--taupe);text-decoration:none;
+  transform:rotate(180deg);transition:color .2s;
+}
+.sidebar-links a:hover{color:var(--warm);}
+.sidebar-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--rust);
+}
+
+/* ── MAIN CONTENT (offset by sidebar) ── */
+.page{margin-left:72px;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  background:var(--bg);
+  display:grid;
+  grid-template-rows:1fr auto;
+  padding:0 80px 64px;
+  position:relative;overflow:hidden;
+}
+
+.hero-top{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding-top:80px;
+}
+
+.hero-eyebrow{
+  font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--taupe);
+  opacity:0;animation:rise .8s .2s forwards;
+}
+.hero-eyebrow span{color:var(--rust);}
+
+.hero-tag-right{
+  text-align:right;
+  font-size:.72rem;font-weight:400;color:var(--taupe);letter-spacing:.06em;
+  line-height:1.8;
+  opacity:0;animation:rise .8s .3s forwards;
+}
+
+.hero-center{
+  padding:40px 0 0;
+  position:relative;z-index:2;
+}
+
+.hero-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(4.5rem,10vw,11.5rem);
+  font-weight:900;
+  line-height:.9;
+  letter-spacing:-.03em;
+  color:var(--ink);
+  margin-bottom:0;
+}
+.hero-title .italic{
+  font-style:italic;
+  font-weight:300;
+  color:var(--rust);
+  font-size:clamp(3.5rem,8vw,9rem);
+}
+.hero-title .outline{
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--ink);
+}
+
+/* Big decorative number */
+.hero-deco{
+  position:absolute;
+  right:-40px;top:50%;transform:translateY(-60%);
+  font-family:'Fraunces',serif;
+  font-size:38vw;font-weight:900;
+  color:rgba(14,23,20,.04);
+  line-height:1;user-select:none;pointer-events:none;
+  letter-spacing:-.05em;
+}
+
+.hero-bottom{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding-top:60px;
+  border-top:1px solid rgba(14,23,20,.12);
+}
+
+.hero-sub{
+  font-size:1rem;font-weight:300;line-height:1.8;
+  color:var(--mid);max-width:380px;
+  opacity:0;animation:rise .8s .7s forwards;
+}
+
+.hero-cta-group{
+  display:flex;flex-direction:column;align-items:flex-end;gap:20px;
+  opacity:0;animation:rise .8s .85s forwards;
+}
+.hero-stats-row{
+  display:flex;gap:48px;
+}
+.hstat-num{
+  font-family:'Fraunces',serif;
+  font-size:2.4rem;font-weight:700;color:var(--ink);
+  line-height:1;letter-spacing:-.02em;
+}
+.hstat-num sup{font-size:.5em;vertical-align:super;color:var(--rust);}
+.hstat-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin-top:4px;}
+
+.btn-main{
+  background:var(--rust);color:var(--paper);
+  font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:16px 40px;border-radius:2px;
+  text-decoration:none;display:inline-block;
+  transition:background .25s,transform .2s;
+}
+.btn-main:hover{background:#b33f1e;transform:translateY(-2px);}
+
+/* ── MARQUEE BAND ── */
+.marquee-band{
+  background:var(--rust);
+  padding:14px 0;overflow:hidden;white-space:nowrap;
+}
+.marquee-inner{
+  display:inline-flex;gap:0;
+  animation:marquee 22s linear infinite;
+}
+.marquee-item{
+  font-family:'Fraunces',serif;
+  font-size:1rem;font-weight:300;font-style:italic;
+  color:var(--paper);letter-spacing:.04em;
+  padding:0 40px;
+}
+.marquee-sep{color:rgba(250,250,245,.4);}
+
+/* ── ABOUT ── */
+.about{
+  background:var(--ink);
+  padding:120px 80px;
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:80px;
+  align-items:start;
+}
+.about-label{
+  font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--rust);padding-top:8px;
+}
+.about-right{}
+.about-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2.4rem,4vw,5rem);
+  font-weight:700;
+  line-height:1.05;
+  color:var(--bg);
+  letter-spacing:-.02em;
+  margin-bottom:40px;
+}
+.about-title em{font-style:italic;font-weight:300;color:var(--warm);}
+.about-body{
+  display:grid;grid-template-columns:1fr 1fr;gap:40px 60px;
+}
+.about-text{
+  font-size:.95rem;font-weight:300;line-height:1.9;
+  color:rgba(240,237,230,.65);
+  grid-column:span 2;
+}
+.about-fact{
+  border-top:1px solid rgba(240,237,230,.12);
+  padding-top:24px;
+}
+.about-fact-num{
+  font-family:'Fraunces',serif;
+  font-size:3rem;font-weight:900;color:var(--warm);
+  line-height:1;letter-spacing:-.03em;margin-bottom:8px;
+}
+.about-fact-label{font-size:.78rem;font-weight:300;color:rgba(240,237,230,.5);line-height:1.6;}
+
+/* ── SERVICES – horizontal rows ── */
+.services{
+  background:var(--bg);
+  padding:0 0 0 0;
+}
+.services-header{
+  padding:100px 80px 56px;
+  display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:1px solid rgba(14,23,20,.1);
+}
+.services-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2rem,3.5vw,3.8rem);
+  font-weight:700;letter-spacing:-.02em;color:var(--ink);
+}
+.services-title em{font-style:italic;font-weight:300;color:var(--rust);}
+.services-hint{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);}
+
+.service-row{
+  display:grid;
+  grid-template-columns:80px 1fr auto;
+  align-items:center;
+  gap:60px;
+  padding:40px 80px;
+  border-bottom:1px solid rgba(14,23,20,.1);
+  cursor:default;
+  transition:background .3s;
+  position:relative;overflow:hidden;
+}
+.service-row::after{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:0;
+  background:var(--rust);
+  transition:width .4s cubic-bezier(.77,0,.18,1);
+}
+.service-row:hover::after{width:4px;}
+.service-row:hover{background:var(--bg2);}
+
+.srow-num{
+  font-family:'Fraunces',serif;
+  font-size:3.5rem;font-weight:900;color:rgba(14,23,20,.08);
+  letter-spacing:-.04em;line-height:1;
+  transition:color .3s;
+}
+.service-row:hover .srow-num{color:rgba(201,75,37,.15);}
+.srow-center{}
+.srow-name{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.4rem,2vw,2.2rem);
+  font-weight:700;letter-spacing:-.01em;color:var(--ink);
+  margin-bottom:10px;
+}
+.srow-desc{
+  font-size:.85rem;font-weight:300;line-height:1.75;
+  color:var(--mid);opacity:.7;max-width:520px;
+}
+.srow-right{text-align:right;}
+.srow-price{
+  font-family:'Fraunces',serif;
+  font-size:1.5rem;font-weight:700;color:var(--ink);
+  letter-spacing:-.01em;
+}
+.srow-period{
+  font-size:.68rem;font-weight:400;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--taupe);margin-top:4px;
+}
+.srow-arrow{
+  font-size:1.4rem;color:var(--rust);margin-top:10px;
+  opacity:0;transition:opacity .3s,transform .3s;
+  transform:translateX(-8px);
+}
+.service-row:hover .srow-arrow{opacity:1;transform:translateX(0);}
+
+/* ── TESTIMONIAL ── */
+.testi{
+  background:var(--bg2);
+  padding:120px 80px;
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:80px;align-items:center;
+}
+.testi-left{
+  display:flex;flex-direction:column;gap:20px;
+}
+.testi-label{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);}
+.testi-avatar{
+  width:88px;height:88px;border-radius:50%;
+  background:linear-gradient(135deg,var(--warm),var(--rust));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--paper);
+}
+.testi-name{font-size:.9rem;font-weight:600;color:var(--ink);}
+.testi-detail{font-size:.75rem;font-weight:300;color:var(--taupe);}
+.testi-stars{color:var(--rust);font-size:1rem;letter-spacing:3px;}
+
+.testi-right{}
+.testi-quote-mark{
+  font-family:'Fraunces',serif;
+  font-size:8rem;font-weight:900;color:var(--rust);
+  line-height:.6;margin-bottom:8px;opacity:.3;
+}
+.testi-quote{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.5rem,2.5vw,2.6rem);
+  font-weight:300;font-style:italic;
+  line-height:1.45;color:var(--ink);
+  letter-spacing:-.01em;
+}
+.testi-result{
+  margin-top:32px;
+  display:inline-flex;align-items:center;gap:14px;
+  background:var(--rust);color:var(--paper);
+  padding:12px 24px;border-radius:2px;
+  font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+}
+
+/* ── PROCESS ── */
+.process{
+  background:var(--ink);
+  padding:120px 80px;
+}
+.process-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:80px;
+}
+.process-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2rem,3.5vw,3.8rem);
+  font-weight:700;letter-spacing:-.02em;
+  color:var(--bg);
+}
+.process-title em{font-style:italic;font-weight:300;color:var(--warm);}
+.process-sub{font-size:.78rem;font-weight:300;color:var(--taupe);max-width:260px;text-align:right;line-height:1.7;}
+
+.steps{display:flex;gap:0;position:relative;}
+.steps::before{
+  content:'';
+  position:absolute;
+  top:32px;left:32px;right:32px;height:1px;
+  background:rgba(184,169,154,.15);
+}
+.step{
+  flex:1;padding:0 32px;
+  position:relative;
+}
+.step-node{
+  width:64px;height:64px;
+  border-radius:50%;
+  border:1px solid rgba(184,169,154,.3);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:32px;
+  position:relative;z-index:1;
+  background:var(--ink);
+  transition:border-color .3s,background .3s;
+}
+.step:hover .step-node{
+  border-color:var(--rust);
+  background:var(--rust);
+}
+.step-n{
+  font-family:'Fraunces',serif;
+  font-size:1.3rem;font-weight:900;color:rgba(240,237,230,.3);
+  transition:color .3s;
+}
+.step:hover .step-n{color:var(--paper);}
+.step-title{
+  font-family:'Fraunces',serif;
+  font-size:1.1rem;font-weight:700;color:var(--bg);
+  margin-bottom:12px;
+}
+.step-desc{
+  font-size:.82rem;font-weight:300;line-height:1.75;
+  color:rgba(240,237,230,.45);
+}
+
+/* ── CTA SECTION ── */
+.cta{
+  background:var(--bg);
+  padding:120px 80px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:100px;align-items:center;
+}
+.cta-left{}
+.cta-eyebrow{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:20px;}
+.cta-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2.5rem,4.5vw,5.5rem);
+  font-weight:900;line-height:.95;letter-spacing:-.03em;
+  color:var(--ink);margin-bottom:28px;
+}
+.cta-title em{font-style:italic;font-weight:300;}
+.cta-body{
+  font-size:.95rem;font-weight:300;line-height:1.85;
+  color:var(--mid);opacity:.8;margin-bottom:48px;max-width:380px;
+}
+.cta-links{display:flex;gap:32px;align-items:center;}
+.link-ghost{
+  font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--taupe);text-decoration:none;
+  display:flex;align-items:center;gap:8px;
+  transition:color .2s,gap .2s;
+}
+.link-ghost:hover{color:var(--ink);gap:12px;}
+.link-ghost::after{content:'→';}
+
+/* form card */
+.form-card{
+  background:var(--ink);
+  border-radius:4px;
+  padding:52px 48px;
+}
+.form-title{
+  font-family:'Fraunces',serif;
+  font-size:1.4rem;font-weight:700;color:var(--bg);
+  margin-bottom:32px;letter-spacing:-.01em;
+}
+.form-title em{font-style:italic;color:var(--warm);}
+.field{margin-bottom:14px;}
+.field input,.field select,.field textarea{
+  width:100%;
+  background:rgba(240,237,230,.06);
+  border:1px solid rgba(240,237,230,.12);
+  border-radius:2px;
+  color:var(--bg);
+  font-family:'Figtree',sans-serif;font-size:.88rem;font-weight:300;
+  padding:13px 16px;outline:none;
+  transition:border-color .2s;
+}
+.field input::placeholder,.field textarea::placeholder{color:rgba(184,169,154,.5);}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--rust);}
+.field select{color:rgba(184,169,154,.6);}
+.field textarea{height:90px;resize:none;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-submit{
+  width:100%;
+  background:var(--rust);color:var(--paper);
+  font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:15px;border:none;cursor:pointer;border-radius:2px;
+  margin-top:8px;
+  transition:background .25s,transform .2s;
+}
+.form-submit:hover{background:#b33f1e;transform:translateY(-2px);}
+.form-note{font-size:.68rem;color:rgba(184,169,154,.4);text-align:center;margin-top:12px;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink);
+  border-top:1px solid rgba(240,237,230,.06);
+  padding:40px 80px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.f-logo{
+  font-family:'Fraunces',serif;
+  font-size:1.1rem;font-weight:700;color:var(--bg);letter-spacing:-.01em;
+}
+.f-links{display:flex;gap:28px;list-style:none;}
+.f-links a{font-size:.72rem;color:var(--taupe);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}
+.f-links a:hover{color:var(--warm);}
+.f-copy{font-size:.7rem;color:rgba(184,169,154,.35);}
+
+/* ── ANIMATIONS ── */
+@keyframes rise{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- SIDEBAR NAV -->
+<nav class="sidebar">
+  <div class="sidebar-logo">Jonas Brandt</div>
+  <ul class="sidebar-links">
+    <li><a href="#about">Über mich</a></li>
+    <li><a href="#services">Angebote</a></li>
+    <li><a href="#process">Ablauf</a></li>
+    <li><a href="#cta">Kontakt</a></li>
+  </ul>
+  <div class="sidebar-dot"></div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-deco">JB</div>
+
+    <div class="hero-top">
+      <p class="hero-eyebrow">Ernährungsberatung · <span>München</span> · Seit 2015</p>
+      <div class="hero-tag-right">
+        Diplom-Ökotrophologe<br/>
+        Sports Nutritionist ISSN
+      </div>
+    </div>
+
+    <div class="hero-center">
+      <h1 class="hero-title">
+        <span style="opacity:0;animation:rise .9s .4s forwards;display:block;">BESSER</span>
+        <span class="italic" style="opacity:0;animation:rise .9s .55s forwards;display:block;">essen,</span>
+        <span class="outline" style="opacity:0;animation:rise .9s .7s forwards;display:block;">MEHR SEIN.</span>
+      </h1>
+    </div>
+
+    <div class="hero-bottom">
+      <p class="hero-sub">Kein Diätplan von der Stange. Ich entwickle mit dir eine Ernährungsweise, die zu deinem Leben passt – und dort auch bleibt.</p>
+      <div class="hero-cta-group">
+        <div class="hero-stats-row">
+          <div>
+            <div class="hstat-num">500<sup>+</sup></div>
+            <div class="hstat-label">Klienten</div>
+          </div>
+          <div>
+            <div class="hstat-num">10</div>
+            <div class="hstat-label">Jahre Erfahrung</div>
+          </div>
+          <div>
+            <div class="hstat-num">98<sup>%</sup></div>
+            <div class="hstat-label">Weiterempfehlung</div>
+          </div>
+        </div>
+        <a href="#cta" class="btn-main">Kostenloses Erstgespräch →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-band">
+    <div class="marquee-inner">
+      <span class="marquee-item">Keine Crashdiäten</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Nachhaltige Ergebnisse</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Individuell & wissenschaftlich</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Für Männer, die es ernst meinen</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Keine Crashdiäten</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Nachhaltige Ergebnisse</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Individuell & wissenschaftlich</span><span class="marquee-sep">·</span>
+      <span class="marquee-item">Für Männer, die es ernst meinen</span><span class="marquee-sep">·</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div>
+      <div class="about-label reveal">Über mich</div>
+    </div>
+    <div class="about-right">
+      <h2 class="about-title reveal">Ich bin Jonas.<br/>Ich hasse <em>sinnlose Verbote.</em></h2>
+      <div class="about-body">
+        <p class="about-text reveal">Nach meinem Studium der Ökotrophologie und 10 Jahren in der Praxis habe ich eines gelernt: Die meisten Diäten scheitern nicht an Willenskraft, sondern daran, dass sie nicht zur Realität des Menschen passen. Ich baue Ernährungskonzepte, die standhalten – im Alltag, im Stress, im Urlaub.</p>
+        <div class="about-fact reveal">
+          <div class="about-fact-num">–15 kg</div>
+          <div class="about-fact-label">Mein eigener Weg. Ich kenne den Frust aus erster Hand.</div>
+        </div>
+        <div class="about-fact reveal">
+          <div class="about-fact-num">∅ 11 W</div>
+          <div class="about-fact-label">Bis meine Klienten signifikante, nachhaltige Ergebnisse sehen.</div>
+        </div>
+        <div class="about-fact reveal">
+          <div class="about-fact-num">0</div>
+          <div class="about-fact-label">Verbotene Lebensmittel in meinen Konzepten. Null.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="services-header reveal">
+      <h2 class="services-title">Was ich <em>anbiete</em></h2>
+      <span class="services-hint">3 Pakete · Hover für Details</span>
+    </div>
+
+    <div class="service-row reveal">
+      <div class="srow-num">01</div>
+      <div class="srow-center">
+        <div class="srow-name">Erstberatung & Analyse</div>
+        <div class="srow-desc">90-minütiges Deep-Dive: Ernährungsprotokoll, Lifestyle-Profil, Zieldefinition. Du gehst raus mit dem ersten konkreten Schritt – nicht mit einer Hochglanz-Broschüre.</div>
+      </div>
+      <div class="srow-right">
+        <div class="srow-price">129 €</div>
+        <div class="srow-period">Einmalig</div>
+        <div class="srow-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="service-row reveal">
+      <div class="srow-num">02</div>
+      <div class="srow-center">
+        <div class="srow-name">12-Wochen-Programm</div>
+        <div class="srow-desc">Mein Kernprodukt. Individueller Ernährungsplan, wöchentliche Video-Check-ins, täglicher Messenger-Support. Für Männer, die einen Partner wollen – keinen Aufpasser.</div>
+      </div>
+      <div class="srow-right">
+        <div class="srow-price">520 €</div>
+        <div class="srow-period">12 Wochen</div>
+        <div class="srow-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="service-row reveal">
+      <div class="srow-num">03</div>
+      <div class="srow-center">
+        <div class="srow-name">Athleten & Sportler</div>
+        <div class="srow-desc">Spezifisch für aktive Männer: Trainingsernährung, Regeneration, Wettkampf-Peaking. Inkl. Blutwert-Auswertung und Supplementcheck – ohne Affiliate-Links.</div>
+      </div>
+      <div class="srow-right">
+        <div class="srow-price">680 €</div>
+        <div class="srow-period">16 Wochen</div>
+        <div class="srow-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="testi" id="testi">
+    <div class="testi-left reveal">
+      <div class="testi-label">Stimmen</div>
+      <div class="testi-avatar">T</div>
+      <div>
+        <div class="testi-name">Thomas B., 41</div>
+        <div class="testi-detail">Ingenieur · Düsseldorf</div>
+      </div>
+      <div class="testi-stars">★★★★★</div>
+    </div>
+    <div class="testi-right reveal">
+      <div class="testi-quote-mark">"</div>
+      <p class="testi-quote">Jonas hat mir in 10 Wochen mehr beigebracht als 5 Jahre Fitnessstudio und ein Regal voller Ernährungsbücher zusammen. Ich verstehe endlich, wie mein Körper wirklich funktioniert.</p>
+      <div class="testi-result">–14 kg in 12 Wochen 🎯</div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" id="process">
+    <div class="process-head reveal">
+      <h2 class="process-title">Der Weg <em>dorthin</em></h2>
+      <p class="process-sub">Kein kompliziertes Onboarding. Vier Schritte, dann läuft es.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-node"><div class="step-n">1</div></div>
+        <div class="step-title">Kennenlernen</div>
+        <div class="step-desc">20 Min. kostenloses Videogespräch. Ich schaue, ob ich dir wirklich helfen kann – kein Verkauf.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-node"><div class="step-n">2</div></div>
+        <div class="step-title">Analyse</div>
+        <div class="step-desc">Ernährungsprotokoll, Alltags-Check, Ziele. Ich verstehe dein Leben, bevor ich irgendetwas empfehle.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-node"><div class="step-n">3</div></div>
+        <div class="step-title">Dein Konzept</div>
+        <div class="step-desc">Klarer, lebenstauglicher Ernährungsplan. Umsetzbar ab Tag 1 – keine Kalorienzähl-App nötig.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-node"><div class="step-n">4</div></div>
+        <div class="step-title">Begleitung</div>
+        <div class="step-desc">Check-ins, Anpassungen, täglicher Support. Weil Veränderung im Alltag passiert, nicht im Beratungsraum.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="cta-left reveal">
+      <div class="cta-eyebrow">Erster Schritt</div>
+      <h2 class="cta-title">Erstgespräch.<br/><em>Kostenlos.</em><br/>Direkt.</h2>
+      <p class="cta-body">20 Minuten. Ich höre zu, du fragst alles. Danach weißt du, ob ich der Richtige für dich bin – ohne Druck, ohne Versprechen.</p>
+      <div class="cta-links">
+        <a href="mailto:hallo@jonas-brandt.de" class="btn-main">Mail schreiben</a>
+        <a href="tel:+4989123456" class="link-ghost">Direkt anrufen</a>
+      </div>
+    </div>
+    <div class="form-card reveal">
+      <div class="form-title">Termin <em>anfragen</em></div>
+      <div class="field-row">
+        <div class="field"><input type="text" placeholder="Vorname"/></div>
+        <div class="field"><input type="text" placeholder="Nachname"/></div>
+      </div>
+      <div class="field"><input type="email" placeholder="E-Mail-Adresse"/></div>
+      <div class="field">
+        <select>
+          <option value="">Ich interessiere mich für ...</option>
+          <option>Erstberatung & Analyse</option>
+          <option>12-Wochen-Programm</option>
+          <option>Athleten & Sportler</option>
+        </select>
+      </div>
+      <div class="field"><textarea placeholder="Kurz dein Ziel (optional)"></textarea></div>
+      <button class="form-submit">Anfrage absenden →</button>
+      <p class="form-note">Antwort innerhalb von 24h · Keine Datenweitergabe</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="f-logo">Jonas Brandt</div>
+    <ul class="f-links">
+      <li><a href="#">Impressum</a></li>
+      <li><a href="#">Datenschutz</a></li>
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Newsletter</a></li>
+    </ul>
+    <p class="f-copy">© 2025 Jonas Brandt Ernährungsberatung</p>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cur');
+const ring = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+
+// Scroll reveal
+const items=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting) setTimeout(()=>e.target.classList.add('vis'),i*80);
+  });
+},{threshold:0.1});
+items.forEach(r=>obs.observe(r));
+</script>
+</body>
+</html>
